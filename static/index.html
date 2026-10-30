@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoicePay AI — Operations Console</title>
+    <style>
+      :root {
+        --ink: #15201d;
+        --muted: #728078;
+        --line: #e2e7e3;
+        --bg: #f5f7f5;
+        --green: #186c50;
+        --light: #e6f5e9;
+        --lime: #d5ef8a;
+        --amber: #f4b45f;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font:
+          14px Inter,
+          ui-sans-serif,
+          system-ui,
+          sans-serif;
+        background: var(--bg);
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 230px 1fr;
+        min-height: 100vh;
+      }
+      .side {
+        padding: 28px 16px;
+        color: #e7f4eb;
+        background: #112a23;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin: 0 8px 45px;
+        color: white;
+        font-size: 19px;
+        font-weight: 800;
+      }
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 31px;
+        height: 31px;
+        border-radius: 10px;
+        background: var(--lime);
+        color: #17382e;
+      }
+      .eyebrow {
+        margin: 0 0 8px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.3px;
+        color: #81bca8;
+      }
+      .side button {
+        display: flex;
+        width: 100%;
+        gap: 11px;
+        align-items: center;
+        margin: 5px 0;
+        border: 0;
+        border-radius: 9px;
+        padding: 11px;
+        background: transparent;
+        color: #b9d0c5;
+        text-align: left;
+      }
+      .side button:hover,
+      .side button.active {
+        background: #1b493a;
+        color: #fff;
+      }
+      .safety {
+        position: absolute;
+        bottom: 22px;
+        left: 16px;
+        right: 16px;
+        padding: 13px;
+        border: 1px solid #356250;
+        border-radius: 11px;
+        background: #17382e;
+        font-size: 11px;
+        color: #b8d2c5;
+      }
+      .safety b {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--lime);
+      }
+      .main {
+        padding: 34px max(30px, 5vw);
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        align-items: start;
+      }
+      .top h1 {
+        margin: 2px 0 5px;
+        font-size: 30px;
+        letter-spacing: -1px;
+      }
+      .top p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .button {
+        border: 0;
+        border-radius: 8px;
+        padding: 11px 15px;
+        font-weight: 700;
+      }
+      .primary {
+        background: var(--green);
+        color: #fff;
+      }
+      .primary:hover {
+        background: #0f583f;
+      }
+      .soft {
+        background: var(--light);
+        color: var(--green);
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin: 29px 0;
+      }
+      .metric {
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 18px;
+        background: #fff;
+      }
+      .metric .icon {
+        display: inline-grid;
+        place-items: center;
+        width: 31px;
+        height: 31px;
+        border-radius: 9px;
+        background: var(--light);
+        color: var(--green);
+        font-size: 15px;
+      }
+      .metric strong {
+        display: block;
+        margin-top: 17px;
+        font-size: 25px;
+      }
+      .metric span {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(390px, 1.1fr) 0.9fr;
+        gap: 19px;
+      }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+      }
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+      .card-head h2 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .card-head p {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .conversation {
+        min-height: 344px;
+        padding: 18px 20px;
+      }
+      .bubble {
+        max-width: 85%;
+        margin: 11px 0;
+        padding: 11px 13px;
+        border-radius: 11px;
+        line-height: 1.45;
+      }
+      .agent {
+        background: #edf5f0;
+        border-bottom-left-radius: 2px;
+      }
+      .customer {
+        margin-left: auto;
+        background: #183f33;
+        color: #fff;
+        border-bottom-right-radius: 2px;
+      }
+      .message-form {
+        display: flex;
+        gap: 8px;
+        padding: 14px;
+        border-top: 1px solid var(--line);
+      }
+      .message-form input {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px;
+      }
+      .message-form button {
+        border: 0;
+        border-radius: 8px;
+        padding: 0 15px;
+        background: var(--green);
+        color: #fff;
+      }
+      .state {
+        padding: 19px;
+      }
+      .flow {
+        display: grid;
+        gap: 0;
+      }
+      .step {
+        position: relative;
+        padding: 0 0 17px 36px;
+        color: #8a968f;
+        font-size: 12px;
+      }
+      .step:before {
+        content: "";
+        position: absolute;
+        top: 1px;
+        left: 0;
+        width: 17px;
+        height: 17px;
+        border: 2px solid #cdd7d1;
+        border-radius: 50%;
+        background: #fff;
+      }
+      .step:not(:last-child):after {
+        content: "";
+        position: absolute;
+        left: 8px;
+        top: 19px;
+        width: 2px;
+        height: 21px;
+        background: #d9e2dc;
+      }
+      .step.active,
+      .step.done {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .step.done:before {
+        border-color: var(--green);
+        background: var(--green);
+        box-shadow: inset 0 0 0 4px #d9f0df;
+      }
+      .step.active:before {
+        border-color: var(--amber);
+        background: #fff4de;
+      }
+      .payment-box {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        background: #fff8e9;
+      }
+      .payment-box b {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .payment-box span {
+        color: #846837;
+        font-size: 12px;
+      }
+      .payment-box button {
+        width: 100%;
+        margin-top: 13px;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px;
+        background: #e8a442;
+        color: #482b08;
+        font-weight: 800;
+      }
+      .table-card {
+        margin-top: 19px;
+        overflow: hidden;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 13px 19px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+      }
+      th {
+        background: #fafcfa;
+        color: #849087;
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+      }
+      td {
+        font-size: 13px;
+      }
+      .pill {
+        display: inline-block;
+        border-radius: 99px;
+        padding: 4px 7px;
+        background: #e6f5e9;
+        color: #176447;
+        font-size: 10px;
+        font-weight: 800;
+      }
+      .pill.warn {
+        background: #fff1db;
+        color: #9a630d;
+      }
+      .empty {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .notice {
+        display: none;
+        margin: 17px 0;
+        padding: 11px 14px;
+        border-radius: 9px;
+        background: #fff0ed;
+        color: #a63622;
+        font-size: 13px;
+      }
+      .notice.show {
+        display: block;
+      }
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .side {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+        .metrics {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 480px) {
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+        .top {
+          flex-direction: column;
+        }
+        .main {
+          padding: 17px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="side">
+        <div class="brand"><span class="mark">◌</span>VoicePay AI</div>
+        <p class="eyebrow">OPERATIONS</p>
+        <button class="active">▣ Overview</button
+        ><button id="callsNav">☎ Live calls</button
+        ><button id="paymentsNav">▤ Payments</button
+        ><button id="auditNav">◈ Audit trail</button>
+        <div class="safety">
+          <b>✓ Guarded payment engine</b>AI can request a tool; it cannot move
+          money on its own.
+        </div>
+      </aside>
+      <main class="main">
+        <div class="top">
+          <div>
+            <p class="eyebrow" style="color: #288065">VOICE AGENT OPERATIONS</p>
+            <h1>Payment control centre</h1>
+            <p>
+              Customer conversations, payment safety and audit
+              visibility—together.
+            </p>
+          </div>
+          <button class="button primary" id="seed">Load demo workspace</button>
+        </div>
+        <div class="notice" id="notice"></div>
+        <section class="metrics">
+          <button class="metric" id="metricCalls">
+            <i class="icon">☎</i><strong id="calls">0</strong
+            ><span>Calls received</span></button
+          ><button class="metric" id="metricPayments">
+            <i class="icon">✓</i><strong id="successful">0</strong
+            ><span>Successful payments</span></button
+          ><button class="metric" id="metricHandoff">
+            <i class="icon">↗</i><strong id="transfers">0</strong
+            ><span>Human transfers</span></button
+          ><button class="metric" id="metricRevenue">
+            <i class="icon">T</i><strong id="revenue">TZS 0</strong
+            ><span>Payment revenue</span>
+          </button>
+        </section>
+        <section class="grid">
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Voice conversation simulator</h2>
+                <p>
+                  Demo caller: +255 712 345 678 · use “order 48392”, then “yes”.
+                </p>
+              </div>
+              <button class="button soft" id="start">Start call</button>
+            </div>
+            <div class="conversation" id="conversation">
+              <p class="empty">
+                Start a call to see the guarded voice-agent flow.
+              </p>
+            </div>
+            <form class="message-form" id="messageForm">
+              <input
+                id="message"
+                disabled
+                placeholder="Say an order number or ask for a human…"
+              /><button disabled id="send">Send</button>
+            </form>
+          </section>
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Payment safety state</h2>
+                <p>
+                  Each transition is recorded before the provider is contacted.
+                </p>
+              </div>
+            </div>
+            <div class="state">
+              <div class="flow">
+                <div class="step" id="s-identified">Customer identified</div>
+                <div class="step" id="s-prepared">Payment prepared</div>
+                <div class="step" id="s-confirmed">Amount confirmed</div>
+                <div class="step" id="s-authorized">Customer authorized</div>
+                <div class="step" id="s-provider">Waiting for provider</div>
+                <div class="step" id="s-success">Payment successful</div>
+              </div>
+              <div class="payment-box" id="paymentBox" hidden>
+                <b>Secure mobile-money request pending</b
+                ><span
+                  >In production, the customer approves this using the
+                  provider’s secure prompt. No PIN is spoken or stored.</span
+                ><button id="approve">Simulate provider approval</button>
+              </div>
+            </div>
+          </section>
+        </section>
+        <section class="card table-card">
+          <div class="card-head">
+            <div>
+              <h2>Recent payment activity</h2>
+              <p>
+                Provider callbacks update the order only after signature
+                verification.
+              </p>
+            </div>
+            <button class="button soft" id="refresh">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Amount</th>
+                <th>Provider reference</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="payments">
+              <tr>
+                <td colspan="4" class="empty">No payments yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      let callId = null,
+        paymentId = null;
+      const stateIds = [
+        "identified",
+        "prepared",
+        "confirmed",
+        "authorized",
+        "provider",
+        "success",
+      ];
+      function notice(text) {
+        $("notice").textContent = text;
+        $("notice").classList.add("show");
+        setTimeout(() => $("notice").classList.remove("show"), 4500);
+      }
+      function bubble(text, who) {
+        const d = document.createElement("div");
+        d.className = "bubble " + who;
+        d.textContent = text;
+        $("conversation").append(d);
+        $("conversation").scrollTop = $("conversation").scrollHeight;
+      }
+      function states(index) {
+        stateIds.forEach((name, i) => {
+          const el = $("s-" + name);
+          el.className =
+            "step " + (i < index ? "done" : i === index ? "active" : "");
+        });
+      }
+      async function json(url, options = {}) {
+        const r = await fetch(url, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        const body = await r.json();
+        if (!r.ok) throw Error(body.detail || "Request failed");
+        return body;
+      }
+      async function refresh() {
+        try {
+          const [metrics, payments] = await Promise.all([
+            json("/api/v1/dashboard"),
+            json("/api/v1/payments"),
+          ]);
+          $("calls").textContent = metrics.calls;
+          $("successful").textContent = metrics.payments_successful;
+          $("transfers").textContent = metrics.human_transfers;
+          $("revenue").textContent =
+            "TZS " + Number(metrics.revenue_tzs).toLocaleString();
+          $("payments").innerHTML = payments.length
+            ? payments
+                .map(
+                  (p) =>
+                    `<tr><td>#${p.order_id}</td><td>TZS ${Number(p.amount).toLocaleString()}</td><td>${p.provider_reference || "—"}</td><td><span class="pill ${p.status === "WAITING_FOR_PROVIDER" ? "warn" : ""}">${p.status}</span></td></tr>`,
+                )
+                .join("")
+            : '<tr><td colspan="4" class="empty">No payments yet.</td></tr>';
+        } catch (e) {
+          notice(e.message);
+        }
+      }
+      async function start() {
+        try {
+          await json("/api/v1/demo/seed", { method: "POST" });
+          const call = await json("/api/v1/calls", {
+            method: "POST",
+            body: JSON.stringify({ caller_number: "+255712345678" }),
+          });
+          callId = call.call_id;
+          $("conversation").innerHTML = "";
+          bubble(call.reply, "agent");
+          $("message").disabled = false;
+          $("send").disabled = false;
+          $("start").textContent = "Call active";
+          $("start").disabled = true;
+          states(0);
+          refresh();
+        } catch (e) {
+          notice(e.message);
+        }
+      }
+      async function send(text) {
+        if (!callId) return;
+        try {
+          bubble(text, "customer");
+          $("message").value = "";
+          const reply = await json(`/api/v1/calls/${callId}/turn`, {
+            method: "POST",
+            body: JSON.stringify({ text }),
+          });
+          bubble(reply.reply, "agent");
+          if (reply.action === "get_order") states(1);
+          if (reply.payment_id) {
+            paymentId = reply.payment_id;
+            states(4);
+            $("paymentBox").hidden = false;
+          }
+          if (reply.action === "transfer_to_human") {
+            notice(
+              "Handoff was recorded. A representative should take over the real call now.",
+            );
+          }
+          refresh();
+        } catch (e) {
+          notice(e.message);
+        }
+      }
+      $("seed").onclick = async () => {
+        try {
+          await json("/api/v1/demo/seed", { method: "POST" });
+          notice("Demo customer John and orders 48392 / 48393 are ready.");
+          refresh();
+        } catch (e) {
+          notice(e.message);
+        }
+      };
+      $("start").onclick = start;
+      $("refresh").onclick = refresh;
+      $("messageForm").onsubmit = (e) => {
+        e.preventDefault();
+        const t = $("message").value.trim();
+        if (t) send(t);
+      };
+      $("approve").onclick = async () => {
+        if (!paymentId) return;
+        try {
+          const p = await json(`/api/v1/payments/${paymentId}/demo-approve`, {
+            method: "POST",
+          });
+          states(5);
+          $("paymentBox").hidden = true;
+          bubble(
+            `Your payment was successful. Your receipt reference is ${p.provider_reference}.`,
+            "agent",
+          );
+          refresh();
+        } catch (e) {
+          notice(e.message);
+        }
+      };
+      [
+        $("callsNav"),
+        $("paymentsNav"),
+        $("auditNav"),
+        $("metricCalls"),
+        $("metricPayments"),
+        $("metricHandoff"),
+        $("metricRevenue"),
+      ].forEach(
+        (button) =>
+          (button.onclick = () =>
+            document
+              .querySelector(".table-card")
+              .scrollIntoView({ behavior: "smooth" })),
+      );
+      refresh();
+    </script>
+  </body>
+</html>
